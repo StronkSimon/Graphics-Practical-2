@@ -6,8 +6,8 @@ Tick the boxes below for the implemented features. Add a brief note only
 if necessary, e.g., if it\'s only partially working, or how to turn it
 on.
 
-Formalities: \[ \] This readme.txt \[ \] Cleaned (no obj/bin folders) \[
-\] Demonstration scene(s) with all implemented features \[ \] (Optional)
+Formalities: \[ \]  This readme.txt \[ \]  Cleaned (no obj/bin folders) \[
+\]  Demonstration scene(s) with all implemented features \[ \] (Optional)  
 Screenshots: make it clear which feature is demonstrated in which
 screenshot
 
