@@ -2,7 +2,7 @@
 using System.IO;
 using OpenTK.Graphics.OpenGL;
 
-namespace Template
+namespace Rasterization
 {
     public class Shader
     {
