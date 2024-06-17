@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using OpenTK.Mathematics;
 
-namespace Template
+namespace Rasterization
 {
     class MyApplication
     {

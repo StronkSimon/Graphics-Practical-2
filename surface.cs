@@ -3,7 +3,7 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using OpenTK.Graphics.OpenGL;
 
-namespace Template
+namespace Rasterization
 {
     public class Surface
     {

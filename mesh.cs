@@ -2,7 +2,7 @@
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 
-namespace Template
+namespace Rasterization
 {
     // Mesh and MeshLoader based on work by JTalton; https://web.archive.org/web/20160123042419/www.opentk.com/node/642
     // Only triangles and quads with vertex positions, normals, and texture coordinates are supported
