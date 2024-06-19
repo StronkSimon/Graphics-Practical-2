@@ -21,6 +21,12 @@ namespace Rasterization
         private Vector2 lastMousePosition;
         private bool firstMouseMovement = true;
 
+        Vector3 CameraPosition = new Vector3(0, -10f, 0);
+        Vector3 CameraAngle = new Vector3(1, 0, 0);
+
+        List<Light> lights = new List<Light>();
+
+
         // constructor
         public MyApplication(Surface screen)
         {
@@ -66,6 +72,9 @@ namespace Rasterization
             // initial transformations
             teapotNode.LocalTransform = Matrix4.CreateScale(0.5f);
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
+
+            lights.Add(new Light(new Vector3(10f, 5f, 2.0f), new Vector3(1.0f, 0.5f, 0.5f)));
+
         }
 
         // tick for background surface
@@ -110,7 +119,9 @@ namespace Rasterization
 
                 if (shader != null && wood != null)
                 {
+
                     sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
+
                 }
 
                 target.Unbind();

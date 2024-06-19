@@ -56,7 +56,7 @@ namespace Rasterization
         }
 
         // render the mesh using the supplied shader and matrix
-        public void Render(Shader shader, Matrix4 objectToScreen, Matrix4 objectToWorld, Texture texture)
+        public void Render(Shader shader, Matrix4 objectToScreen, Matrix4 objectToWorld, Texture texture, List<Light> lights, Vector3 cameraPosition)
         {
             // on first run, prepare buffers
             Prepare();
@@ -75,10 +75,17 @@ namespace Rasterization
             GL.UniformMatrix4(shader.uniform_objectToScreen, false, ref objectToScreen);
             GL.UniformMatrix4(shader.uniform_objectToWorld, false, ref objectToWorld);
 
+            GL.Uniform3(shader.uniform_ambientLightColor, new Vector3(0.1f, 0.1f, 0.1f));
+            GL.Uniform3(shader.uniform_cameraPosition, cameraPosition);
+
+            GL.Uniform3(shader.uniform_lightPosition, lights[0].Position);
+            GL.Uniform3(shader.uniform_lightColor, new Vector3(1f, 1f, 1f));
+
             // enable position, normal and uv attribute arrays corresponding to the shader "in" variables
             GL.EnableVertexAttribArray(shader.in_vertexPositionObject);
             GL.EnableVertexAttribArray(shader.in_vertexNormalObject);
             GL.EnableVertexAttribArray(shader.in_vertexUV);
+
 
             // bind vertex data
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferId);
