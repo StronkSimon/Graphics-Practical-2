@@ -17,6 +17,8 @@ namespace Rasterization
         int triangleBufferId;                   // element buffer object (EBO) for triangle vertex indices
         int quadBufferId;                       // element buffer object (EBO) for quad vertex indices (not in Modern OpenGL)
 
+        public Matrix4 ModelMatrix { get; set; } = Matrix4.Identity;
+
         // constructor
         public Mesh(string filename)
         {

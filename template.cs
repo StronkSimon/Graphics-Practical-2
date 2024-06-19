@@ -40,7 +40,7 @@ namespace Rasterization
         public OpenTKApp()
             : base(GameWindowSettings.Default, new NativeWindowSettings()
             {
-                ClientSize = new Vector2i(640, 360),
+                ClientSize = new Vector2i(1280, 720),
                 Profile = (allowPrehistoricOpenGL && !isMac) ? ContextProfile.Compatability : ContextProfile.Core,
                 Flags = (isMac ? ContextFlags.Default : ContextFlags.Debug)
                     | ((allowPrehistoricOpenGL && !isMac) ? ContextFlags.Default : ContextFlags.ForwardCompatible),
@@ -139,6 +139,7 @@ namespace Rasterization
             // called once per frame; app logic
             var keyboard = KeyboardState;
             if (keyboard[Keys.Escape]) terminated = true;
+            app?.ProcessInput(keyboard, MouseState, (float)e.Time);
         }
         protected override void OnRenderFrame(FrameEventArgs e)
         {

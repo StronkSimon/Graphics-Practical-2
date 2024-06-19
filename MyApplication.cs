@@ -1,21 +1,25 @@
 using System.Diagnostics;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Rasterization
 {
     class MyApplication
     {
         // member variables
-        public Surface screen;                  // background surface for printing etc.
-        Mesh? teapot, floor;                    // meshes to draw using OpenGL
-        float a = 0;                            // teapot rotation angle
-        readonly Stopwatch timer = new();       // timer for measuring frame duration
-        Shader? shader;                         // shader to use for rendering
-        Shader? postproc;                       // shader to use for post processing
-        Texture? wood;                          // texture to use for rendering
-        RenderTarget? target;                   // intermediate render target
-        ScreenQuad? quad;                       // screen filling quad for post processing
-        readonly bool useRenderTarget = true;   // required for post processing
+        public Surface screen;
+        SceneGraph sceneGraph;
+        Camera camera;
+        float a = 0;
+        readonly Stopwatch timer = new();
+        Shader? shader;
+        Shader? postproc;
+        Texture? wood;
+        RenderTarget? target;
+        ScreenQuad? quad;
+        readonly bool useRenderTarget = true;
+        private Vector2 lastMousePosition;
+        private bool firstMouseMovement = true;
 
         Vector3 CameraPosition = new Vector3(0, -10f, 0);
         Vector3 CameraAngle = new Vector3(1, 0, 0);
@@ -27,33 +31,57 @@ namespace Rasterization
         public MyApplication(Surface screen)
         {
             this.screen = screen;
+            sceneGraph = new SceneGraph();
+            camera = new Camera(new Vector3(0, 0, 10), Vector3.UnitY, -90.0f, 0.0f);
         }
+
         // initialize
         public void Init()
         {
-            // load teapot
-            teapot = new Mesh("../../../assets/teapot.obj");
-            floor = new Mesh("../../../assets/floor.obj");
-            // initialize stopwatch
-            timer.Reset();
-            timer.Start();
+            // load meshes
+            Mesh teapot = new Mesh("../../../assets/teapot.obj");
+            Mesh floor = new Mesh("../../../assets/floor.obj");
+
             // create shaders
             shader = new Shader("../../../shaders/vs.glsl", "../../../shaders/fs.glsl");
             postproc = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_post.glsl");
+
             // load a texture
             wood = new Texture("../../../assets/wood.jpg");
+
             // create the render target
             if (useRenderTarget) target = new RenderTarget(screen.width, screen.height);
             quad = new ScreenQuad();
 
+            // setup scene graph
+            SceneNode root = sceneGraph.Root;
+            SceneNode teapotNode = new SceneNode(teapot);
+            SceneNode floorNode = new SceneNode(floor);
+            root.AddChild(teapotNode);
+            root.AddChild(floorNode);
+
+            // create additional nodes
+            SceneNode teapotNode2 = new SceneNode(teapot);
+            teapotNode2.SetTransform(Matrix4.CreateTranslation(new Vector3(3, 0, 0)));
+            root.AddChild(teapotNode2);
+
+            SceneNode teapotNode3 = new SceneNode(teapot);
+            teapotNode3.SetTransform(Matrix4.CreateTranslation(new Vector3(-3, 0, 0)));
+            root.AddChild(teapotNode3);
+
+            // initial transformations
+            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f);
+            floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
+
             lights.Add(new Light(new Vector3(10f, 5f, 2.0f), new Vector3(1.0f, 0.5f, 0.5f)));
+
         }
 
         // tick for background surface
         public void Tick()
         {
             screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffff00);
+            screen.Print("3D Engine Demo", 2, 2, 0xffff00);
         }
 
         // tick for OpenGL rendering code
@@ -64,43 +92,79 @@ namespace Rasterization
             timer.Reset();
             timer.Start();
 
-            // prepare matrix for vertex shader
-            float angle90degrees = MathF.PI / 2;
-            Matrix4 teapotObjectToWorld = Matrix4.CreateScale(0.5f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
-            Matrix4 floorObjectToWorld = Matrix4.CreateScale(4.0f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
-            Matrix4 worldToCamera = Matrix4.CreateTranslation(new Vector3(0, -10f, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(1, 0, 0),angle90degrees);
-            Matrix4 cameraToScreen = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), (float)screen.width/screen.height, .1f, 1000);
-
             // update rotation
             a += 0.001f * frameDuration;
             if (a > 2 * MathF.PI) a -= 2 * MathF.PI;
 
+            // update scene graph transforms
+            SceneNode teapotNode = sceneGraph.Root.Children[0];
+            SceneNode floorNode = sceneGraph.Root.Children[1];
+            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a);
+            floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
+
+            SceneNode teapotNode2 = sceneGraph.Root.Children[2];
+            teapotNode2.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(new Vector3(3, 0, 0));
+
+            SceneNode teapotNode3 = sceneGraph.Root.Children[3];
+            teapotNode3.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(new Vector3(-3, 0, 0));
+
+            // prepare matrices
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(camera.GetZoom(), (float)screen.width / screen.height, 0.1f, 1000f);
+            Matrix4 viewProjection = view * projection;
+
             if (useRenderTarget && target != null && quad != null)
             {
-                // enable render target
                 target.Bind();
 
-                // render scene to render target
                 if (shader != null && wood != null)
                 {
-                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood,lights,CameraPosition);
-                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood,lights,CameraPosition);
+
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
+
                 }
 
-                // render quad
                 target.Unbind();
                 if (postproc != null)
                     quad.Render(postproc, target.GetTextureID());
             }
             else
             {
-                // render scene directly to the screen
                 if (shader != null && wood != null)
                 {
-                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood,lights, CameraPosition);
-                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood,lights, CameraPosition);
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
                 }
             }
+        }
+
+        public void ProcessInput(KeyboardState keyboardState, MouseState mouseState, float deltaTime)
+        {
+            if (keyboardState.IsKeyDown(Keys.W))
+                camera.ProcessKeyboard(Keys.W, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.S))
+                camera.ProcessKeyboard(Keys.S, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.A))
+                camera.ProcessKeyboard(Keys.A, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.D))
+                camera.ProcessKeyboard(Keys.D, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.Space))
+                camera.ProcessKeyboard(Keys.Space, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.LeftControl))
+                camera.ProcessKeyboard(Keys.LeftControl, deltaTime);
+
+            if (firstMouseMovement)
+            {
+                lastMousePosition = new Vector2(mouseState.X, mouseState.Y);
+                firstMouseMovement = false;
+            }
+
+            float xOffset = mouseState.X - lastMousePosition.X;
+            float yOffset = lastMousePosition.Y - mouseState.Y;
+            lastMousePosition = new Vector2(mouseState.X, mouseState.Y);
+
+            camera.ProcessMouseMovement(xOffset, yOffset);
+
+            camera.ProcessMouseScroll(mouseState.Scroll.Y);
         }
     }
 }
