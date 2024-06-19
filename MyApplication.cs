@@ -86,7 +86,7 @@ namespace Rasterization
 
             // prepare matrices
             Matrix4 view = camera.GetViewMatrix();
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), (float)screen.width / screen.height, 0.1f, 1000f);
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(camera.GetZoom(), (float)screen.width / screen.height, 0.1f, 1000f);
             Matrix4 viewProjection = view * projection;
 
             if (useRenderTarget && target != null && quad != null)
@@ -121,6 +121,10 @@ namespace Rasterization
                 camera.ProcessKeyboard(Keys.A, deltaTime);
             if (keyboardState.IsKeyDown(Keys.D))
                 camera.ProcessKeyboard(Keys.D, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.Space))
+                camera.ProcessKeyboard(Keys.Space, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.LeftControl))
+                camera.ProcessKeyboard(Keys.LeftControl, deltaTime);
 
             if (firstMouseMovement)
             {
@@ -133,6 +137,8 @@ namespace Rasterization
             lastMousePosition = new Vector2(mouseState.X, mouseState.Y);
 
             camera.ProcessMouseMovement(xOffset, yOffset);
+
+            camera.ProcessMouseScroll(mouseState.Scroll.Y);
         }
     }
 }

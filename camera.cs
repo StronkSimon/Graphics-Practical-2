@@ -12,10 +12,11 @@ namespace Rasterization
         private Vector3 worldUp;
         private float yaw;
         private float pitch;
+        private float zoom;
         private float speed;
         private float sensitivity;
 
-        public Camera(Vector3 position, Vector3 up, float yaw, float pitch, float speed = 2.5f, float sensitivity = 0.1f)
+        public Camera(Vector3 position, Vector3 up, float yaw, float pitch, float speed = 2.5f, float sensitivity = 0.1f, float zoom = 45.0f)
         {
             this.position = position;
             this.worldUp = up;
@@ -23,12 +24,18 @@ namespace Rasterization
             this.pitch = pitch;
             this.speed = speed;
             this.sensitivity = sensitivity;
+            this.zoom = zoom;
             UpdateCameraVectors();
         }
 
         public Matrix4 GetViewMatrix()
         {
             return Matrix4.LookAt(position, position + front, up);
+        }
+
+        public float GetZoom()
+        {
+            return MathHelper.DegreesToRadians(zoom);
         }
 
         public void ProcessKeyboard(Keys key, float deltaTime)
@@ -42,6 +49,10 @@ namespace Rasterization
                 position -= right * velocity;
             if (key == Keys.D)
                 position += right * velocity;
+            if (key == Keys.Space)
+                position += worldUp * velocity;
+            if (key == Keys.LeftControl)
+                position -= worldUp * velocity;
         }
 
         public void ProcessMouseMovement(float xOffset, float yOffset)
@@ -58,6 +69,15 @@ namespace Rasterization
                 pitch = -89.0f;
 
             UpdateCameraVectors();
+        }
+
+        public void ProcessMouseScroll(float yOffset)
+        {
+            zoom -= yOffset;
+            if (zoom < 1.0f)
+                zoom = 1.0f;
+            if (zoom > 45.0f)
+                zoom = 45.0f;
         }
 
         private void UpdateCameraVectors()
