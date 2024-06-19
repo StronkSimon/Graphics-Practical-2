@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Rasterization
 {
@@ -8,6 +9,7 @@ namespace Rasterization
         // member variables
         public Surface screen;
         SceneGraph sceneGraph;
+        Camera camera;
         float a = 0;
         readonly Stopwatch timer = new();
         Shader? shader;
@@ -16,12 +18,15 @@ namespace Rasterization
         RenderTarget? target;
         ScreenQuad? quad;
         readonly bool useRenderTarget = true;
+        private Vector2 lastMousePosition;
+        private bool firstMouseMovement = true;
 
         // constructor
         public MyApplication(Surface screen)
         {
             this.screen = screen;
             sceneGraph = new SceneGraph();
+            camera = new Camera(new Vector3(0, 0, 3), Vector3.UnitY, -90.0f, 0.0f);
         }
 
         // initialize
@@ -80,9 +85,9 @@ namespace Rasterization
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f) * Matrix4.CreateRotationY(a);
 
             // prepare matrices
-            float angle90degrees = MathF.PI / 2;
-            Matrix4 worldToCamera = Matrix4.CreateTranslation(new Vector3(0, -14.5f, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(1, 0, 0), angle90degrees);
-            Matrix4 cameraToScreen = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), (float)screen.width / screen.height, .1f, 1000);
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), (float)screen.width / screen.height, 0.1f, 1000f);
+            Matrix4 viewProjection = view * projection;
 
             if (useRenderTarget && target != null && quad != null)
             {
@@ -90,7 +95,7 @@ namespace Rasterization
 
                 if (shader != null && wood != null)
                 {
-                    sceneGraph.Render(shader, cameraToScreen, worldToCamera, wood);
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
                 }
 
                 target.Unbind();
@@ -101,9 +106,33 @@ namespace Rasterization
             {
                 if (shader != null && wood != null)
                 {
-                    sceneGraph.Render(shader, cameraToScreen, worldToCamera, wood);
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
                 }
             }
+        }
+
+        public void ProcessInput(KeyboardState keyboardState, MouseState mouseState, float deltaTime)
+        {
+            if (keyboardState.IsKeyDown(Keys.W))
+                camera.ProcessKeyboard(Keys.W, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.S))
+                camera.ProcessKeyboard(Keys.S, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.A))
+                camera.ProcessKeyboard(Keys.A, deltaTime);
+            if (keyboardState.IsKeyDown(Keys.D))
+                camera.ProcessKeyboard(Keys.D, deltaTime);
+
+            if (firstMouseMovement)
+            {
+                lastMousePosition = new Vector2(mouseState.X, mouseState.Y);
+                firstMouseMovement = false;
+            }
+
+            float xOffset = mouseState.X - lastMousePosition.X;
+            float yOffset = lastMousePosition.Y - mouseState.Y;
+            lastMousePosition = new Vector2(mouseState.X, mouseState.Y);
+
+            camera.ProcessMouseMovement(xOffset, yOffset);
         }
     }
 }
