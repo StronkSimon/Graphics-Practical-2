@@ -17,6 +17,12 @@ namespace Rasterization
         ScreenQuad? quad;                       // screen filling quad for post processing
         readonly bool useRenderTarget = true;   // required for post processing
 
+        Vector3 CameraPosition = new Vector3(0, -10f, 0);
+        Vector3 CameraAngle = new Vector3(1, 0, 0);
+
+        List<Light> lights = new List<Light>();
+
+
         // constructor
         public MyApplication(Surface screen)
         {
@@ -39,6 +45,8 @@ namespace Rasterization
             // create the render target
             if (useRenderTarget) target = new RenderTarget(screen.width, screen.height);
             quad = new ScreenQuad();
+
+            lights.Add(new Light(new Vector3(10f, 5f, 2.0f), new Vector3(1.0f, 0.5f, 0.5f)));
         }
 
         // tick for background surface
@@ -60,7 +68,7 @@ namespace Rasterization
             float angle90degrees = MathF.PI / 2;
             Matrix4 teapotObjectToWorld = Matrix4.CreateScale(0.5f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
             Matrix4 floorObjectToWorld = Matrix4.CreateScale(4.0f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
-            Matrix4 worldToCamera = Matrix4.CreateTranslation(new Vector3(0, -14.5f, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(1, 0, 0), angle90degrees);
+            Matrix4 worldToCamera = Matrix4.CreateTranslation(new Vector3(0, -10f, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(1, 0, 0),angle90degrees);
             Matrix4 cameraToScreen = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(60.0f), (float)screen.width/screen.height, .1f, 1000);
 
             // update rotation
@@ -75,8 +83,8 @@ namespace Rasterization
                 // render scene to render target
                 if (shader != null && wood != null)
                 {
-                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood);
-                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood);
+                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood,lights,CameraPosition);
+                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood,lights,CameraPosition);
                 }
 
                 // render quad
@@ -89,8 +97,8 @@ namespace Rasterization
                 // render scene directly to the screen
                 if (shader != null && wood != null)
                 {
-                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood);
-                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood);
+                    teapot?.Render(shader, teapotObjectToWorld * worldToCamera * cameraToScreen, teapotObjectToWorld, wood,lights, CameraPosition);
+                    floor?.Render(shader, floorObjectToWorld * worldToCamera * cameraToScreen, floorObjectToWorld, wood,lights, CameraPosition);
                 }
             }
         }
