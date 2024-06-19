@@ -119,9 +119,7 @@ namespace Rasterization
 
                 if (shader != null && wood != null)
                 {
-
-                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
-
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood, lights, camera.position);
                 }
 
                 target.Unbind();
@@ -132,7 +130,7 @@ namespace Rasterization
             {
                 if (shader != null && wood != null)
                 {
-                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood);
+                    sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood, lights, camera.position);
                 }
             }
         }

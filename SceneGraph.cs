@@ -29,22 +29,22 @@ namespace Rasterization
     {
         public SceneNode Root { get; } = new SceneNode(null);
 
-        public void Render(Shader shader, Matrix4 viewProjectionMatrix, Matrix4 parentTransform, Texture texture)
+        public void Render(Shader shader, Matrix4 viewProjectionMatrix, Matrix4 parentTransform, Texture texture, List<Light> lights, Vector3 cameraPosition)
         {
-            RenderNode(Root, shader, viewProjectionMatrix, parentTransform, texture);
+            RenderNode(Root, shader, viewProjectionMatrix, parentTransform, texture, lights, cameraPosition);
         }
 
-        private void RenderNode(SceneNode node, Shader shader, Matrix4 viewProjectionMatrix, Matrix4 parentTransform, Texture texture)
+        private void RenderNode(SceneNode node, Shader shader, Matrix4 viewProjectionMatrix, Matrix4 parentTransform, Texture texture, List<Light> lights, Vector3 cameraPosition)
         {
             Matrix4 globalTransform = node.LocalTransform * parentTransform;
             if (node.Mesh != null)
             {
                 Matrix4 modelViewProjection = globalTransform * viewProjectionMatrix;
-                node.Mesh.Render(shader, modelViewProjection, globalTransform, texture);
+                node.Mesh.Render(shader, modelViewProjection, globalTransform, texture, lights, cameraPosition);
             }
             foreach (var child in node.Children)
             {
-                RenderNode(child, shader, viewProjectionMatrix, globalTransform, texture);
+                RenderNode(child, shader, viewProjectionMatrix, globalTransform, texture, lights, cameraPosition);
             }
         }
     }

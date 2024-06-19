@@ -5,16 +5,16 @@ namespace Rasterization
 {
     public class Camera
     {
-        private Vector3 position;
-        private Vector3 front;
-        private Vector3 up;
-        private Vector3 right;
-        private Vector3 worldUp;
-        private float yaw;
-        private float pitch;
-        private float zoom;
-        private float speed;
-        private float sensitivity;
+        public Vector3 position;
+        public Vector3 front;
+        public Vector3 up;
+        public Vector3 right;
+        public Vector3 worldUp;
+        public float yaw;
+        public float pitch;
+        public float zoom;
+        public float speed;
+        public float sensitivity;
 
         public Camera(Vector3 position, Vector3 up, float yaw, float pitch, float speed = 2.5f, float sensitivity = 0.1f, float zoom = 45.0f)
         {
