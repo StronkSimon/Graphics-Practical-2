@@ -26,7 +26,7 @@ namespace Rasterization
         {
             this.screen = screen;
             sceneGraph = new SceneGraph();
-            camera = new Camera(new Vector3(0, 0, 3), Vector3.UnitY, -90.0f, 0.0f);
+            camera = new Camera(new Vector3(0, 0, 10), Vector3.UnitY, -90.0f, 0.0f);
         }
 
         // initialize
@@ -54,16 +54,25 @@ namespace Rasterization
             root.AddChild(teapotNode);
             root.AddChild(floorNode);
 
+            // create additional nodes
+            SceneNode teapotNode2 = new SceneNode(teapot);
+            teapotNode2.SetTransform(Matrix4.CreateTranslation(new Vector3(3, 0, 0)));
+            root.AddChild(teapotNode2);
+
+            SceneNode teapotNode3 = new SceneNode(teapot);
+            teapotNode3.SetTransform(Matrix4.CreateTranslation(new Vector3(-3, 0, 0)));
+            root.AddChild(teapotNode3);
+
             // initial transformations
-            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a);
-            floorNode.LocalTransform = Matrix4.CreateScale(4.0f) * Matrix4.CreateRotationY(a);
+            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f);
+            floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
         }
 
         // tick for background surface
         public void Tick()
         {
             screen.Clear(0);
-            screen.Print("hello world", 2, 2, 0xffff00);
+            screen.Print("3D Engine Demo", 2, 2, 0xffff00);
         }
 
         // tick for OpenGL rendering code
@@ -82,7 +91,13 @@ namespace Rasterization
             SceneNode teapotNode = sceneGraph.Root.Children[0];
             SceneNode floorNode = sceneGraph.Root.Children[1];
             teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a);
-            floorNode.LocalTransform = Matrix4.CreateScale(4.0f) * Matrix4.CreateRotationY(a);
+            floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
+
+            SceneNode teapotNode2 = sceneGraph.Root.Children[2];
+            teapotNode2.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(new Vector3(3, 0, 0));
+
+            SceneNode teapotNode3 = sceneGraph.Root.Children[3];
+            teapotNode3.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(new Vector3(-3, 0, 0));
 
             // prepare matrices
             Matrix4 view = camera.GetViewMatrix();

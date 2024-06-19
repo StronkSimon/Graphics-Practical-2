@@ -18,6 +18,11 @@ namespace Rasterization
         {
             Children.Add(child);
         }
+
+        public void SetTransform(Matrix4 transform)
+        {
+            LocalTransform = transform;
+        }
     }
 
     public class SceneGraph
