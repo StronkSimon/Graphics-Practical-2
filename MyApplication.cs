@@ -26,6 +26,20 @@ namespace Rasterization
 
         List<Light> lights = new List<Light>();
 
+        // Add new shaders and render targets
+        Shader? extractBrightShader;
+        Shader? blurShaderH;
+        Shader? blurShaderV;
+        Shader? combineShader;
+
+        RenderTarget? hdrRenderTarget;
+        RenderTarget? blurRenderTarget1;
+        RenderTarget? blurRenderTarget2;
+
+        // Position variables for teapots
+        Vector3 teapot1Position = new Vector3(0, 0, 0);
+        Vector3 teapot2Position = new Vector3(0, 5, 0);
+        Vector3 teapot3Position = new Vector3(-10, 0, 5);
 
         // constructor
         public MyApplication(Surface screen)
@@ -45,6 +59,10 @@ namespace Rasterization
             // create shaders
             shader = new Shader("../../../shaders/vs.glsl", "../../../shaders/fs.glsl");
             postproc = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_post.glsl");
+            extractBrightShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_extract_bright.glsl");
+            blurShaderH = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_blur_horizontal.glsl");
+            blurShaderV = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_blur_vertical.glsl");
+            combineShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_combine.glsl");
 
             // load a texture
             wood = new Texture("../../../assets/wood.jpg");
@@ -52,6 +70,9 @@ namespace Rasterization
             // create the render target
             if (useRenderTarget) target = new RenderTarget(screen.width, screen.height);
             quad = new ScreenQuad();
+            hdrRenderTarget = new RenderTarget(screen.width, screen.height);
+            blurRenderTarget1 = new RenderTarget(screen.width, screen.height);
+            blurRenderTarget2 = new RenderTarget(screen.width, screen.height);
 
             // setup scene graph
             SceneNode root = sceneGraph.Root;
@@ -62,11 +83,11 @@ namespace Rasterization
 
             // create additional nodes
             SceneNode teapotNode2 = new SceneNode(teapot);
-            teapotNode2.SetTransform(Matrix4.CreateTranslation(new Vector3(3, 0, 0)));
+            teapotNode2.SetTransform(Matrix4.CreateTranslation(teapot2Position));
             root.AddChild(teapotNode2);
 
             SceneNode teapotNode3 = new SceneNode(teapot);
-            teapotNode3.SetTransform(Matrix4.CreateTranslation(new Vector3(-3, 0, 0)));
+            teapotNode3.SetTransform(Matrix4.CreateTranslation(teapot3Position));
             root.AddChild(teapotNode3);
 
             // initial transformations
@@ -87,44 +108,71 @@ namespace Rasterization
         // tick for OpenGL rendering code
         public void RenderGL()
         {
-            // measure frame duration
+            // Measure frame duration
             float frameDuration = timer.ElapsedMilliseconds;
             timer.Reset();
             timer.Start();
 
-            // update rotation
+            // Update rotation
             a += 0.001f * frameDuration;
             if (a > 2 * MathF.PI) a -= 2 * MathF.PI;
 
-            // update scene graph transforms
+            // Update scene graph transforms
             SceneNode teapotNode = sceneGraph.Root.Children[0];
             SceneNode floorNode = sceneGraph.Root.Children[1];
-            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a);
+            teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(teapot1Position);
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
 
             SceneNode teapotNode2 = sceneGraph.Root.Children[2];
-            teapotNode2.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(new Vector3(3, 0, 0));
+            teapotNode2.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(teapot2Position);
 
             SceneNode teapotNode3 = sceneGraph.Root.Children[3];
-            teapotNode3.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(new Vector3(-3, 0, 0));
+            teapotNode3.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(teapot3Position);
 
-            // prepare matrices
+            // Prepare matrices
             Matrix4 view = camera.GetViewMatrix();
             Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(camera.GetZoom(), (float)screen.width / screen.height, 0.1f, 1000f);
             Matrix4 viewProjection = view * projection;
 
-            if (useRenderTarget && target != null && quad != null)
+            if (hdrRenderTarget != null && blurRenderTarget1 != null && blurRenderTarget2 != null && quad != null)
             {
-                target.Bind();
-
+                // 1. Render the scene to the HDR render target
+                hdrRenderTarget.Bind();
                 if (shader != null && wood != null)
                 {
                     sceneGraph.Render(shader, viewProjection, Matrix4.Identity, wood, lights, camera.position);
                 }
+                hdrRenderTarget.Unbind();
 
-                target.Unbind();
-                if (postproc != null)
-                    quad.Render(postproc, target.GetTextureID());
+                // 2. Extract bright areas
+                blurRenderTarget1.Bind();
+                if (extractBrightShader != null)
+                {
+                    quad.Render(extractBrightShader, hdrRenderTarget.GetTextureID());
+                }
+                blurRenderTarget1.Unbind();
+
+                // 3. Apply horizontal blur
+                blurRenderTarget2.Bind();
+                if (blurShaderH != null)
+                {
+                    quad.Render(blurShaderH, blurRenderTarget1.GetTextureID());
+                }
+                blurRenderTarget2.Unbind();
+
+                // 4. Apply vertical blur
+                blurRenderTarget1.Bind();
+                if (blurShaderV != null)
+                {
+                    quad.Render(blurShaderV, blurRenderTarget2.GetTextureID());
+                }
+                blurRenderTarget1.Unbind();
+
+                // 5. Combine the original image with the blurred image
+                if (combineShader != null)
+                {
+                    quad.Render(combineShader, hdrRenderTarget.GetTextureID(), blurRenderTarget1.GetTextureID());
+                }
             }
             else
             {

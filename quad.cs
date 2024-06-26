@@ -70,5 +70,44 @@ namespace Rasterization
             // disable shader
             GL.UseProgram(0);
         }
+
+        // render the mesh using the supplied shader and multiple textures
+        public void Render(Shader shader, int textureID1, int textureID2)
+        {
+            // on first run, prepare buffers
+            Prepare(shader);
+
+            // enable shader
+            GL.UseProgram(shader.programID);
+
+            // enable first texture
+            int texLoc1 = GL.GetUniformLocation(shader.programID, "originalImage");
+            GL.Uniform1(texLoc1, 0);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, textureID1);
+
+            // enable second texture
+            int texLoc2 = GL.GetUniformLocation(shader.programID, "blurredImage");
+            GL.Uniform1(texLoc2, 1);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, textureID2);
+
+            // enable position and uv attributes
+            GL.EnableVertexAttribArray(shader.in_vertexPositionObject);
+            GL.EnableVertexAttribArray(shader.in_vertexUV);
+
+            // bind vertex data
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+
+            // link vertex attributes to shader parameters 
+            GL.VertexAttribPointer(shader.in_vertexPositionObject, 3, VertexAttribPointerType.Float, false, 20, 0);
+            GL.VertexAttribPointer(shader.in_vertexUV, 2, VertexAttribPointerType.Float, false, 20, 3 * 4);
+
+            // render (no EBO so use DrawArrays to process vertices in the order they're specified in the VBO)
+            GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+
+            // disable shader
+            GL.UseProgram(0);
+        }
     }
 }
