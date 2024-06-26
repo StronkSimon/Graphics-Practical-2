@@ -12,10 +12,7 @@ namespace Rasterization
         Camera camera;
         float a = 0;
         readonly Stopwatch timer = new();
-        Shader? shader;
-        Shader? postproc;
         Texture? wood;
-        RenderTarget? target;
         ScreenQuad? quad;
         readonly bool useRenderTarget = true;
         private Vector2 lastMousePosition;
@@ -27,11 +24,14 @@ namespace Rasterization
         List<Light> lights = new List<Light>();
 
         // Add new shaders and render targets
+        Shader? shader;
+        Shader? postproc;
         Shader? extractBrightShader;
         Shader? blurShaderH;
         Shader? blurShaderV;
         Shader? combineShader;
 
+        RenderTarget? target;
         RenderTarget? hdrRenderTarget;
         RenderTarget? blurRenderTarget1;
         RenderTarget? blurRenderTarget2;
