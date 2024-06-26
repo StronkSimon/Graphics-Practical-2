@@ -12,7 +12,7 @@
 Screenshots: make it clear which feature is demonstrated in which screenshot  
   
 #### Minimum requirements implemented:  
-\[X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom/  
+\[X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom 
 \[X] Model matrix: for each mesh, stored aspart of the scene graph   
 \[X] Scene graph data structure: tree hierarchy, no limitation on breadth or depth or size  
 \[X] Rendering: recursive scene graph traversal, correct model matrix concatenation   
