@@ -12,12 +12,12 @@
 Screenshots: make it clear which feature is demonstrated in which screenshot  
   
 #### Minimum requirements implemented:  
-\[ \] Camera: position and orientation controls Controls: \...   
-\[ \] Model matrix: for each mesh, stored aspart of the scene graph   
-\[ \] Scene graph data structure: tree hierarchy, no limitation on breadth or depth or size  
-\[ \] Rendering: recursive scene graph traversal, correct model matrix concatenation   
-\[ \] Shading in fragment shader: diffuse, glossy, uniform variable for ambient light color  
-\[ \] Point light: at least 1, position/color may be hardcoded  
+\[X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom/  
+\[X] Model matrix: for each mesh, stored aspart of the scene graph   
+\[X] Scene graph data structure: tree hierarchy, no limitation on breadth or depth or size  
+\[X] Rendering: recursive scene graph traversal, correct model matrix concatenation   
+\[X] Shading in fragment shader: diffuse, glossy, uniform variable for ambient light color  
+\[X] Point light: at least 1, position/color may be hardcoded  
 
 #### Bonus features implemented:  
 \[ \] Multiple point lights: at least 4, uniform variables to change position and color at runtime   
@@ -28,8 +28,8 @@ Screenshots: make it clear which feature is demonstrated in which screenshot
 \[ \] Shadow mapping: render depth map to texture, only hard shadows required, some artifacts allowed   
 \[ \] Vignetting and chromatic aberrations: darker corners, color channels separated more near corners   
 \[ \] Color grading: color cube lookup table   
-\[ \] Blur: separate horizontal and vertical blur passes, variable blur size   
-\[ \] HDR glow: HDR render target, blur in HDR, tone-mapping   
+\[X] Blur: separate horizontal and vertical blur passes, variable blur size   
+\[X] HDR glow: HDR render target, blur in HDR, tone-mapping   
 \[ \] Depth of field: blur size based on distance from camera, some artifacts allowed   
 \[ \] Ambient occlusion: darker in tight corners, implemented as screen-space post process   
 \[ \] \...  
