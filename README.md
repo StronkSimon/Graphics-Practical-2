@@ -34,6 +34,7 @@
 [ \] \...  
 
 ### Added Features:  
+The features below can be turned off by setting the bools in MyApplication.cs to false
 #### Vignetting and Chromatic Aberration  
 Description: This feature adds a vignette effect, making the corners of the screen darker, and a chromatic aberration effect, which separates the color channels near the corners.  
   
