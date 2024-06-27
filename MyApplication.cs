@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Rasterization
 {
@@ -31,12 +32,16 @@ namespace Rasterization
         Shader? blurShaderV;
         Shader? combineShader;
         Shader? vignetteChromaticShader;
+        Shader? colorGradingShader;
 
         RenderTarget? target;
         RenderTarget? hdrRenderTarget;
         RenderTarget? blurRenderTarget1;
         RenderTarget? blurRenderTarget2;
         RenderTarget? intermediateTarget;
+
+        int lutTexture;
+        const int lutSize = 16; // LUT size
 
         // Position variables for teapots
         Vector3 teapot1Position = new Vector3(0, 0, 0);
@@ -66,6 +71,7 @@ namespace Rasterization
             blurShaderV = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_blur_vertical.glsl");
             combineShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_combine.glsl");
             vignetteChromaticShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_vignette_chromatic.glsl");
+            colorGradingShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_color_grading.glsl");
 
             // load a texture
             wood = new Texture("../../../assets/wood.jpg");
@@ -77,6 +83,10 @@ namespace Rasterization
             blurRenderTarget1 = new RenderTarget(screen.width, screen.height);
             blurRenderTarget2 = new RenderTarget(screen.width, screen.height);
             intermediateTarget = new RenderTarget(screen.width, screen.height);
+
+            // Generate and load the identity LUT
+            byte[] lutData = LUTUtility.GenerateIdentityLUT(lutSize);
+            lutTexture = LUTUtility.LoadLUTTexture(lutData, lutSize);
 
             // setup scene graph
             SceneNode root = sceneGraph.Root;
@@ -99,7 +109,6 @@ namespace Rasterization
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
 
             lights.Add(new Light(new Vector3(10f, 5f, 2.0f), new Vector3(1.0f, 0.5f, 0.5f)));
-
         }
 
         // tick for background surface
@@ -186,6 +195,18 @@ namespace Rasterization
                     vignetteChromaticShader.Use();
                     vignetteChromaticShader.SetUniform("screenSize", new Vector2(screen.width, screen.height));
                     quad.Render(vignetteChromaticShader, intermediateTarget.GetTextureID());
+                }
+
+                // 7. Apply color grading
+                if (colorGradingShader != null)
+                {
+                    colorGradingShader.Use();
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture3D, lutTexture);
+                    colorGradingShader.SetUniform("colorLUT", 1);
+                    colorGradingShader.SetUniform("lutSize", (float)lutSize);
+
+                    quad.Render(colorGradingShader, intermediateTarget.GetTextureID());
                 }
             }
             else
