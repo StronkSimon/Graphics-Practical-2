@@ -4,6 +4,7 @@ namespace Rasterization
 {
     public static class LUTUtility
     {
+        // Generates an identity LUT (Look-Up Table) of the given size
         public static byte[] GenerateIdentityLUT(int size)
         {
             byte[] data = new byte[size * size * size * 3];
@@ -23,6 +24,7 @@ namespace Rasterization
             return data;
         }
 
+        // Loads a 3D texture from the LUT data and returns the texture ID
         public static int LoadLUTTexture(byte[] lutData, int size)
         {
             int textureID = GL.GenTexture();
