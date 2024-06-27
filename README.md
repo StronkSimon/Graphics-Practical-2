@@ -15,7 +15,8 @@
 ![with_post](https://github.com/StronkSimon/Graphics-Practical-2/assets/91748973/788c42b3-293b-4646-9f47-f5cad84f3f72)  
   
 ### Minimum requirements implemented:  
-[X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom   
+[X] Camera: position and orientation controls  
+Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom   
 [X] Model matrix: for each mesh, stored aspart of the scene graph   
 [X] Scene graph data structure: tree hierarchy, no limitation on breadth or depth or size  
 [X] Rendering: recursive scene graph traversal, correct model matrix concatenation   
@@ -35,7 +36,6 @@
 [X] HDR glow: HDR render target, blur in HDR, tone-mapping   
 [ \] Depth of field: blur size based on distance from camera, some artifacts allowed   
 [ \] Ambient occlusion: darker in tight corners, implemented as screen-space post process   
-[ \] \...  
 
 ### Added Features:  
 The features below can be turned off by setting the bools in MyApplication.cs to false
