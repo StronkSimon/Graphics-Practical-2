@@ -33,6 +33,7 @@ namespace Rasterization
         Shader? combineShader;
         Shader? vignetteChromaticShader;
         Shader? colorGradingShader;
+        Shader? toneMappingShader;
 
         RenderTarget? target;
         RenderTarget? hdrRenderTarget;
@@ -72,6 +73,7 @@ namespace Rasterization
             combineShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_combine.glsl");
             vignetteChromaticShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_vignette_chromatic.glsl");
             colorGradingShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_color_grading.glsl");
+            toneMappingShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_tone_mapping.glsl");
 
             // load a texture
             wood = new Texture("../../../assets/wood.jpg");
@@ -134,7 +136,7 @@ namespace Rasterization
             SceneNode teapotNode = sceneGraph.Root.Children[0];
             SceneNode floorNode = sceneGraph.Root.Children[1];
             teapotNode.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(teapot1Position);
-            floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
+            floorNode.LocalTransform = Matrix4.CreateScale(4.0f) * Matrix4.CreateRotationY(a);
 
             SceneNode teapotNode2 = sceneGraph.Root.Children[2];
             teapotNode2.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(a) * Matrix4.CreateTranslation(teapot2Position);
@@ -207,6 +209,13 @@ namespace Rasterization
                     colorGradingShader.SetUniform("lutSize", (float)lutSize);
 
                     quad.Render(colorGradingShader, intermediateTarget.GetTextureID());
+                }
+
+                // 8. Apply tone-mapping
+                if (toneMappingShader != null)
+                {
+                    toneMappingShader.Use();
+                    quad.Render(toneMappingShader, intermediateTarget.GetTextureID());
                 }
             }
             else
