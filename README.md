@@ -5,10 +5,10 @@
 - Yoeri Hoebe 4769341 
 
 #### Formalities:   
-\[ \]  This readme.txt   
-\[ \]  Cleaned (no obj/bin folders)   
-\[ \]  Demonstration scene(s) with all implemented features  
-\[ \] (Optional)   
+[X]  This readme.txt   
+[ \]  Cleaned (no obj/bin folders)   
+[ \]  Demonstration scene(s) with all implemented features  
+[ \] (Optional)   
   
 Screenshots: make it clear which feature is demonstrated in which screenshot  
   
@@ -28,7 +28,7 @@ Screenshots: make it clear which feature is demonstrated in which screenshot
 [ \] Bump or normal mapping   
 [ \] Shadow mapping: render depth map to texture, only hard shadows required, some artifacts allowed   
 [X] Vignetting and chromatic aberrations: darker corners, color channels separated more near corners   
-[ \] Color grading: color cube lookup table   
+[X] Color grading: color cube lookup table   
 [X] Blur: separate horizontal and vertical blur passes, variable blur size   
 [X] HDR glow: HDR render target, blur in HDR, tone-mapping   
 [ \] Depth of field: blur size based on distance from camera, some artifacts allowed   
