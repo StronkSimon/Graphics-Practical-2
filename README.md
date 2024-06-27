@@ -7,8 +7,12 @@
 ### Formalities:   
 [X]  This readme.txt   
 [ \]  Cleaned (no obj/bin folders)   
-[ \]  Demonstration scene(s) with all implemented features     
-[ \] Screenshots: make it clear which feature is demonstrated in which screenshot   
+[X]  Demonstration scene(s) with all implemented features     
+[X] Screenshots:  
+-Without Post-Processing
+![without_post](https://github.com/StronkSimon/Graphics-Practical-2/assets/91748973/27f9e3ff-8cb5-4be4-9a61-5ee00fc7e331)  
+-With Post-Processing
+![with_post](https://github.com/StronkSimon/Graphics-Practical-2/assets/91748973/788c42b3-293b-4646-9f47-f5cad84f3f72)  
   
 ### Minimum requirements implemented:  
 [X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom   
