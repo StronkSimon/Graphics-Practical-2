@@ -121,7 +121,11 @@ namespace Rasterization
             teapotNode.LocalTransform = Matrix4.CreateScale(0.5f);
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
 
+            // Add multiple lights with different properties
             lights.Add(new Light(new Vector3(10f, 5f, 2.0f), new Vector3(1.0f, 0.5f, 0.5f)));
+            lights.Add(new Light(new Vector3(-10f, 5f, 2.0f), new Vector3(0.5f, 1.0f, 0.5f)));
+            lights.Add(new Light(new Vector3(0f, 5f, 10.0f), new Vector3(0.5f, 0.5f, 1.0f)));
+            lights.Add(new Light(new Vector3(0f, 10f, -10.0f), new Vector3(1.0f, 1.0f, 0.5f)));
         }
 
         // tick for background surface
