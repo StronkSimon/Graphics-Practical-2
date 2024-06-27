@@ -7,10 +7,8 @@
 #### Formalities:   
 [X]  This readme.txt   
 [ \]  Cleaned (no obj/bin folders)   
-[ \]  Demonstration scene(s) with all implemented features  
-[ \] (Optional)   
-  
-Screenshots: make it clear which feature is demonstrated in which screenshot  
+[ \]  Demonstration scene(s) with all implemented features     
+[ \] Screenshots: make it clear which feature is demonstrated in which screenshot   
   
 #### Minimum requirements implemented:  
 [X] Camera: position and orientation controls Controls: WASD for forward, left, backward and right. Spacebar for up and Left Ctrl for down. Scrollwheel can be used to zoom   
@@ -35,4 +33,48 @@ Screenshots: make it clear which feature is demonstrated in which screenshot
 [ \] Ambient occlusion: darker in tight corners, implemented as screen-space post process   
 [ \] \...  
 
-##### Notes:  
+##### Notes:
+Added Features:  
+1. Vignetting and Chromatic Aberration  
+Description: This feature adds a vignette effect, making the corners of the screen darker, and a chromatic aberration effect, which separates the color channels near the corners.  
+  
+Implementation:  
+  
+Shader: Created a new fragment shader fs_vignette_chromatic.glsl.  
+Shader Code:  
+Applied chromatic aberration by shifting the UV coordinates for red, green, and blue channels.  
+Implemented a vignette effect using a smoothstep function based on distance from the center.  
+Integration: Updated the rendering pipeline in MyApplication.cs to use this shader during the post-processing stage.  
+  
+2. Color Grading  
+Description: This feature applies color grading to the rendered image using a 3D color look-up table (LUT) for advanced color manipulation.  
+  
+Implementation:  
+  
+LUT Generation: Created a method GenerateIdentityLUT to generate an identity LUT, which maps each color to itself.  
+LUT Loading: Created a method LoadLUTTexture to load the generated LUT into a 3D texture.  
+Shader: Created a new fragment shader fs_color_grading.glsl to apply the LUT.  
+Shader Code:  
+Sampled the LUT using the RGB values of each pixel to adjust the color.  
+Integration: Updated the rendering pipeline in MyApplication.cs to use this shader during the post-processing stage.  
+  
+3. Blur  
+Description: This feature applies a blur effect to the rendered image using separate horizontal and vertical blur passes, allowing for variable blur sizes.  
+  
+Implementation:  
+  
+Shaders: Created fragment shaders fs_blur_horizontal.glsl and fs_blur_vertical.glsl for horizontal and vertical blur passes.  
+Shader Code:  
+Horizontal blur shader samples and averages the neighboring pixels horizontally.  
+Vertical blur shader samples and averages the neighboring pixels vertically.  
+Integration: Updated the rendering pipeline in MyApplication.cs to use these shaders for sequential blur passes.  
+  
+4. HDR Glow  
+Description: This feature adds a glow effect by using an HDR render target, applying blur in HDR, and performing tone-mapping to convert HDR to LDR.  
+  
+Implementation:  
+  
+HDR Render Target: Created an HDR render target to capture the scene in high dynamic range.  
+Blur in HDR: Applied the horizontal and vertical blur shaders to the HDR render target.  
+Tone-Mapping Shader: Created a tone-mapping shader to convert the HDR image to LDR.  
+Integration: Updated the rendering pipeline in MyApplication.cs to use these shaders and render targets to achieve the HDR glow effect.  
