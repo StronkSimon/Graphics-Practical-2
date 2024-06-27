@@ -30,11 +30,13 @@ namespace Rasterization
         Shader? blurShaderH;
         Shader? blurShaderV;
         Shader? combineShader;
+        Shader? vignetteChromaticShader;
 
         RenderTarget? target;
         RenderTarget? hdrRenderTarget;
         RenderTarget? blurRenderTarget1;
         RenderTarget? blurRenderTarget2;
+        RenderTarget? intermediateTarget;
 
         // Position variables for teapots
         Vector3 teapot1Position = new Vector3(0, 0, 0);
@@ -63,6 +65,7 @@ namespace Rasterization
             blurShaderH = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_blur_horizontal.glsl");
             blurShaderV = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_blur_vertical.glsl");
             combineShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_combine.glsl");
+            vignetteChromaticShader = new Shader("../../../shaders/vs_post.glsl", "../../../shaders/fs_vignette_chromatic.glsl");
 
             // load a texture
             wood = new Texture("../../../assets/wood.jpg");
@@ -73,6 +76,7 @@ namespace Rasterization
             hdrRenderTarget = new RenderTarget(screen.width, screen.height);
             blurRenderTarget1 = new RenderTarget(screen.width, screen.height);
             blurRenderTarget2 = new RenderTarget(screen.width, screen.height);
+            intermediateTarget = new RenderTarget(screen.width, screen.height);
 
             // setup scene graph
             SceneNode root = sceneGraph.Root;
@@ -169,9 +173,19 @@ namespace Rasterization
                 blurRenderTarget1.Unbind();
 
                 // 5. Combine the original image with the blurred image
+                intermediateTarget.Bind();
                 if (combineShader != null)
                 {
                     quad.Render(combineShader, hdrRenderTarget.GetTextureID(), blurRenderTarget1.GetTextureID());
+                }
+                intermediateTarget.Unbind();
+
+                // 6. Apply vignetting and chromatic aberration
+                if (vignetteChromaticShader != null)
+                {
+                    vignetteChromaticShader.Use();
+                    vignetteChromaticShader.SetUniform("screenSize", new Vector2(screen.width, screen.height));
+                    quad.Render(vignetteChromaticShader, intermediateTarget.GetTextureID());
                 }
             }
             else

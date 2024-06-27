@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 
 namespace Rasterization
 {
@@ -41,6 +42,67 @@ namespace Rasterization
             uniform_lightColor = GL.GetUniformLocation(programID, "lightColor");
             uniform_ambientLightColor = GL.GetUniformLocation(programID, "ambientLightColor");
             uniform_cameraPosition = GL.GetUniformLocation(programID, "cameraPosition");
+        }
+
+        // method to use the shader program
+        public void Use()
+        {
+            GL.UseProgram(programID);
+        }
+
+        // method to set uniform variables
+        public void SetUniform(string name, int value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.Uniform1(location, value);
+            }
+        }
+
+        public void SetUniform(string name, float value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.Uniform1(location, value);
+            }
+        }
+
+        public void SetUniform(string name, Vector2 value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.Uniform2(location, value);
+            }
+        }
+
+        public void SetUniform(string name, Vector3 value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.Uniform3(location, value);
+            }
+        }
+
+        public void SetUniform(string name, Vector4 value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.Uniform4(location, value);
+            }
+        }
+
+        public void SetUniform(string name, Matrix4 value)
+        {
+            int location = GL.GetUniformLocation(programID, name);
+            if (location != -1)
+            {
+                GL.UniformMatrix4(location, false, ref value);
+            }
         }
 
         // loading shaders
