@@ -48,6 +48,7 @@ namespace Rasterization
         Vector3 teapot1Position = new Vector3(0, 0, 0);
         Vector3 teapot2Position = new Vector3(0, 5, 0);
         Vector3 teapot3Position = new Vector3(-10, 0, 5);
+        Vector3 teapot4Position = new Vector3(-10, 5, 5);
 
         // Post-processing toggles
         private bool enableVignetteChromatic = true;
@@ -112,6 +113,10 @@ namespace Rasterization
             teapotNode3.SetTransform(Matrix4.CreateTranslation(teapot3Position));
             root.AddChild(teapotNode3);
 
+            SceneNode teapotNode4 = new SceneNode(teapot);
+            teapotNode4.SetTransform(Matrix4.CreateTranslation(teapot4Position));
+            root.AddChild(teapotNode4);
+
             // initial transformations
             teapotNode.LocalTransform = Matrix4.CreateScale(0.5f);
             floorNode.LocalTransform = Matrix4.CreateScale(4.0f);
@@ -149,6 +154,9 @@ namespace Rasterization
 
             SceneNode teapotNode3 = sceneGraph.Root.Children[3];
             teapotNode3.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(teapot3Position);
+
+            SceneNode teapotNode4 = sceneGraph.Root.Children[4];
+            teapotNode4.LocalTransform = Matrix4.CreateScale(0.5f) * Matrix4.CreateRotationY(-a) * Matrix4.CreateTranslation(teapot4Position);
 
             // Prepare matrices
             Matrix4 view = camera.GetViewMatrix();
