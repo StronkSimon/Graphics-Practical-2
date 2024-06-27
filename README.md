@@ -33,9 +33,9 @@
 [ \] Ambient occlusion: darker in tight corners, implemented as screen-space post process   
 [ \] \...  
 
-### Notes:
-####Added Features:  
-#####Vignetting and Chromatic Aberration  
+## Notes:
+###Added Features:  
+####Vignetting and Chromatic Aberration  
 Description: This feature adds a vignette effect, making the corners of the screen darker, and a chromatic aberration effect, which separates the color channels near the corners.  
   
 Implementation:  
@@ -45,7 +45,7 @@ Applied chromatic aberration by shifting the UV coordinates for red, green, and 
 Implemented a vignette effect using a smoothstep function based on distance from the center.  
 Integration: Updated the rendering pipeline in MyApplication.cs to use this shader during the post-processing stage.  
   
-#####Color Grading  
+####Color Grading  
 Description: This feature applies color grading to the rendered image using a 3D color look-up table (LUT) for advanced color manipulation.  
   
 Implementation:  
@@ -56,7 +56,7 @@ Shader Code:
 Sampled the LUT using the RGB values of each pixel to adjust the color.  
 Integration: Updated the rendering pipeline in MyApplication.cs to use this shader during the post-processing stage.  
   
-#####Blur  
+####Blur  
 Description: This feature applies a blur effect to the rendered image using separate horizontal and vertical blur passes, allowing for variable blur sizes.  
   
 Implementation:  
@@ -66,7 +66,7 @@ Horizontal blur shader samples and averages the neighboring pixels horizontally.
 Vertical blur shader samples and averages the neighboring pixels vertically.  
 Integration: Updated the rendering pipeline in MyApplication.cs to use these shaders for sequential blur passes.  
   
-#####HDR Glow  
+####HDR Glow  
 Description: This feature adds a glow effect by using an HDR render target, applying blur in HDR, and performing tone-mapping to convert HDR to LDR.  
   
 Implementation:  
