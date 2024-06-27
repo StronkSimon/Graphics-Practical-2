@@ -49,6 +49,12 @@ namespace Rasterization
         Vector3 teapot2Position = new Vector3(0, 5, 0);
         Vector3 teapot3Position = new Vector3(-10, 0, 5);
 
+        // Post-processing toggles
+        private bool enableVignetteChromatic = true;
+        private bool enableColorGrading = true;
+        private bool enableBlur = true;
+        private bool enableHDRGlow = true;
+
         // constructor
         public MyApplication(Surface screen)
         {
@@ -167,21 +173,24 @@ namespace Rasterization
                 }
                 blurRenderTarget1.Unbind();
 
-                // 3. Apply horizontal blur
-                blurRenderTarget2.Bind();
-                if (blurShaderH != null)
+                if (enableBlur)
                 {
-                    quad.Render(blurShaderH, blurRenderTarget1.GetTextureID());
-                }
-                blurRenderTarget2.Unbind();
+                    // 3. Apply horizontal blur
+                    blurRenderTarget2.Bind();
+                    if (blurShaderH != null)
+                    {
+                        quad.Render(blurShaderH, blurRenderTarget1.GetTextureID());
+                    }
+                    blurRenderTarget2.Unbind();
 
-                // 4. Apply vertical blur
-                blurRenderTarget1.Bind();
-                if (blurShaderV != null)
-                {
-                    quad.Render(blurShaderV, blurRenderTarget2.GetTextureID());
+                    // 4. Apply vertical blur
+                    blurRenderTarget1.Bind();
+                    if (blurShaderV != null)
+                    {
+                        quad.Render(blurShaderV, blurRenderTarget2.GetTextureID());
+                    }
+                    blurRenderTarget1.Unbind();
                 }
-                blurRenderTarget1.Unbind();
 
                 // 5. Combine the original image with the blurred image
                 intermediateTarget.Bind();
@@ -192,7 +201,7 @@ namespace Rasterization
                 intermediateTarget.Unbind();
 
                 // 6. Apply vignetting and chromatic aberration
-                if (vignetteChromaticShader != null)
+                if (enableVignetteChromatic && vignetteChromaticShader != null)
                 {
                     vignetteChromaticShader.Use();
                     vignetteChromaticShader.SetUniform("screenSize", new Vector2(screen.width, screen.height));
@@ -200,7 +209,7 @@ namespace Rasterization
                 }
 
                 // 7. Apply color grading
-                if (colorGradingShader != null)
+                if (enableColorGrading && colorGradingShader != null)
                 {
                     colorGradingShader.Use();
                     GL.ActiveTexture(TextureUnit.Texture1);
