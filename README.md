@@ -6,7 +6,7 @@
 
 ### Formalities:   
 [X]  This readme.txt   
-[ \]  Cleaned (no obj/bin folders)   
+[X]  Cleaned (no obj/bin folders)   
 [X]  Demonstration scene(s) with all implemented features     
 [X] Screenshots:  
 -Without Post-Processing
